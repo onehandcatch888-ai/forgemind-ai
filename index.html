@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ForgeMind AI – Free Mod Builder + Music Mastering</title>
+<meta name="description" content="ForgeMind AI - Free powerful AI for Minecraft mod and plugin development plus music mastering. Upload jars, zips, or audio. Generate Forge, Fabric, Paper, Spigot starters and professional mastering plans.">
+<meta name="keywords" content="ForgeMind AI, Minecraft mod builder, plugin development, AI modding, music mastering AI, free AI tools, upload jar zip">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="ForgeMind AI – Mod Builder + Music Mastering">
+<meta property="og:description" content="Free AI tools to build Minecraft mods/plugins and master music. Upload files supported.">
+<style>
+  :root {
+    --bg: #0b0b0b; --card: #141414; --border: #2a2a2a;
+    --gold: #e4b04a; --text: #e8eef6; --muted: #8b95a5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh;
+  }
+  header {
+    padding: 28px 16px 18px; text-align: center; border-bottom: 1px solid var(--border);
+  }
+  header h1 { font-size: 1.7rem; color: var(--gold); letter-spacing: 1px; }
+  header p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+  .tabs { display: flex; border-bottom: 1px solid var(--border); background: #0f0f0f; }
+  .tab-btn {
+    flex: 1; padding: 14px 8px; background: none; border: none;
+    color: var(--muted); font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .panel { display: none; padding: 20px 16px 50px; max-width: 720px; margin: 0 auto; }
+  .panel.active { display: block; }
+  label { display: block; font-size: 0.8rem; color: var(--gold); margin: 14px 0 5px; font-weight: 600; }
+  input, select, textarea {
+    width: 100%; background: #0e0e0e; border: 1px solid var(--border);
+    color: var(--text); padding: 11px 12px; border-radius: 8px;
+    font-size: 0.95rem; font-family: inherit;
+  }
+  textarea { min-height: 90px; resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--gold); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .row > * { flex: 1; min-width: 140px; }
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  button.primary {
+    background: var(--gold); color: #000; border: none;
+    padding: 12px 20px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+  }
+  button.secondary {
+    background: transparent; color: var(--gold); border: 1px solid var(--gold);
+    padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;
+  }
+  .status { font-size: 0.8rem; color: var(--muted); margin-top: 10px; min-height: 1.2em; }
+  .output {
+    margin-top: 16px; background: #0a0a0a; border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px; font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.8rem; white-space: pre-wrap; max-height: 420px; overflow-y: auto;
+    display: none; color: #c8d0dc;
+  }
+  .output.show { display: block; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip {
+    background: #1a1a1a; border: 1px solid var(--border); color: var(--muted);
+    padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; cursor: pointer;
+  }
+  .chip.on { border-color: var(--gold); color: var(--gold); }
+  .upload-box {
+    border: 2px dashed var(--border); border-radius: 10px; padding: 18px;
+    text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 6px;
+    background: #0e0e0e; cursor: pointer; transition: border-color .15s;
+  }
+  .upload-box:hover, .upload-box.drag { border-color: var(--gold); color: var(--gold); }
+  .upload-box input { display: none; }
+  .file-info {
+    margin-top: 8px; font-size: 0.82rem; color: var(--gold);
+    word-break: break-all;
+  }
+  footer {
+    text-align: center; padding: 24px 16px; color: #555;
+    font-size: 0.8rem; border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>ForgeMind AI</h1>
+  <p>Mod Builder + Music Mastering • Upload any file</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('mod', this)">Mod Builder</button>
+  <button class="tab-btn" onclick="showTab('music', this)">Music Mastering</button>
+</div>
+
+<div id="mod" class="panel active">
+  <label>Project Name</label>
+  <input id="modName" value="SkyMinigames" placeholder="MyMod">
+
+  <label>Platform</label>
+  <div class="chip-row" id="platformChips">
+    <span class="chip on" data-v="forge" onclick="setPlatform(this)">Forge 1.20.1</span>
+    <span class="chip" data-v="fabric" onclick="setPlatform(this)">Fabric 1.20.1</span>
+    <span class="chip" data-v="paper" onclick="setPlatform(this)">Paper Plugin</span>
+    <span class="chip" data-v="spigot" onclick="setPlatform(this)">Spigot Plugin</span>
+  </div>
+
+  <label>Focus</label>
+  <select id="modFocus">
+    <option value="minigame">Minigame / Bedwars-style Arena</option>
+    <option value="combat">Combat Abilities / Skills</option>
+    <option value="economy">Economy / Shops</option>
+    <option value="utility">Utility / Admin Tools</option>
+    <option value="improve">Improve Existing Mod/Plugin</option>
+    <option value="custom">Custom</option>
+  </select>
+
+  <label>Features or description</label>
+  <textarea id="modFeats" placeholder="teams, generators, bed defense, kits, scoreboard..."></textarea>
+
+  <label>Upload existing mod/plugin (jar, zip, or any file)</label>
+  <div class="upload-box" id="modDrop" onclick="document.getElementById('modFile').click()">
+    Drop .jar / .zip / any file here or tap to choose
+    <input type="file" id="modFile" onchange="handleModFile(this)">
+  </div>
+  <div class="file-info" id="modFileInfo"></div>
+
+  <label>Or paste code to improve</label>
+  <textarea id="modCode" placeholder="Paste Java code, configs, or any text..."></textarea>
+
+  <div class="btn-row">
+    <button class="primary" onclick="generateMod()">Generate / Improve</button>
+    <button class="secondary" onclick="copyOutput('modOut')">Copy Result</button>
+  </div>
+  <div class="status" id="modStatus"></div>
+  <div class="output" id="modOut"></div>
+</div>
+
+<div id="music" class="panel">
+  <label>Describe your mix</label>
+  <textarea id="mixDesc" placeholder="Trap beat, heavy 808s, vocals a bit buried..."></textarea>
+
+  <div class="row">
+    <div>
+      <label>Genre</label>
+      <select id="mixGenre">
+        <option value="trap">Trap / Hip-Hop</option>
+        <option value="drill">Drill</option>
+        <option value="rnb">R&B / Melodic</option>
+        <option value="rock">Rock / Alt</option>
+        <option value="electronic">Electronic</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div>
+      <label>Target Loudness</label>
+      <select id="mixTarget">
+        <option value="streaming">Streaming (-14 LUFS)</option>
+        <option value="competitive">Competitive (-9 to -11)</option>
+        <option value="balanced">Balanced (-12)</option>
+      </select>
+    </div>
+  </div>
+
+  <label>Specific problems (optional)</label>
+  <input id="mixProblems" placeholder="muddy low end, harsh vocals, weak punch...">
+
+  <label>Upload audio or any file</label>
+  <div class="upload-box" id="masDrop" onclick="document.getElementById('masFile').click()">
+    Drop audio / zip / any file here or tap to choose
+    <input type="file" id="masFile" onchange="handleMasFile(this)">
+  </div>
+  <div class="file-info" id="masFileInfo"></div>
+
+  <div class="btn-row">
+    <button class="primary" onclick="generateMaster()">Get Mastering Plan</button>
+    <button class="secondary" onclick="copyOutput('masOut')">Copy Result</button>
+  </div>
+  <div class="status" id="masStatus"></div>
+  <div class="output" id="masOut"></div>
+</div>
+
+<footer>ForgeMind AI • Upload any file • Runs in your browser</footer>
+
+<script>
+let currentPlatform = 'forge';
+let modUploaded = null;
+let masUploaded = null;
+
+function showTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function setPlatform(el) {
+  document.querySelectorAll('#platformChips .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  currentPlatform = el.dataset.v;
+}
+
+function copyOutput(id) {
+  const el = document.getElementById(id);
+  if (!el || !el.textContent) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const statusId = id === 'modOut' ? 'modStatus' : 'masStatus';
+    document.getElementById(statusId).textContent = 'Copied';
+    setTimeout(() => document.getElementById(statusId).textContent = '', 1800);
+  });
+}
+
+function handleModFile(input) {
+  const f = input.files[0];
+  if (!f) return;
+  modUploaded = f;
+  document.getElementById('modFileInfo').textContent = `Selected: ${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+}
+function handleMasFile(input) {
+  const f = input.files[0];
+  if (!f) return;
+  masUploaded = f;
+  document.getElementById('masFileInfo').textContent = `Selected: ${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+}
+
+['modDrop', 'masDrop'].forEach(id => {
+  const box = document.getElementById(id);
+  box.addEventListener('dragover', e => { e.preventDefault(); box.classList.add('drag'); });
+  box.addEventListener('dragleave', () => box.classList.remove('drag'));
+  box.addEventListener('drop', e => {
+    e.preventDefault();
+    box.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (!f) return;
+    if (id === 'modDrop') {
+      modUploaded = f;
+      document.getElementById('modFileInfo').textContent = `Selected: ${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+    } else {
+      masUploaded = f;
+      document.getElementById('masFileInfo').textContent = `Selected: ${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+    }
+  });
+});
+
+function generateMod() {
+  const name = (document.getElementById('modName').value || 'MyProject').trim();
+  const focus = document.getElementById('modFocus').value;
+  const feats = (document.getElementById('modFeats').value || '').trim();
+  const existing = (document.getElementById('modCode').value || '').trim();
+  const status = document.getElementById('modStatus');
+  const out = document.getElementById('modOut');
+
+  status.textContent = 'Working...';
+  out.classList.remove('show');
+
+  const finish = (fileNote) => {
+    const id = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const cls = name.replace(/[^a-zA-Z0-9]/g, '');
+    let features = feats ? feats.split(/[,|\n]/).map(s => s.trim()).filter(Boolean) : [];
+    if (features.length === 0) {
+      if (focus === 'minigame') features = ['teams', 'generators', 'bed defense', 'scoreboard', 'kits', 'respawn'];
+      if (focus === 'combat') features = ['abilities', 'cooldowns', 'particles', 'damage modifiers'];
+      if (focus === 'economy') features = ['balances', 'shops', 'transactions'];
+      if (focus === 'utility') features = ['commands', 'permissions', 'config'];
+    }
+
+    let result = `// =====================================================\n`;
+    result += `// FORGEMIND AI — ${name.toUpperCase()}\n`;
+    result += `// Platform: ${currentPlatform.toUpperCase()}\n`;
+    result += `// =====================================================\n\n`;
+
+    if (fileNote) result += `UPLOADED FILE: ${fileNote}\n\n`;
+
+    if (existing || fileNote) {
+      result += `MODE: Improve / Expand existing project\n\n`;
+      if (existing) {
+        result += `PASTED CODE (reference):\n${existing.slice(0, 1200)}${existing.length > 1200 ? '\n... (truncated)' : ''}\n\n`;
+      }
+      result += `SUGGESTED IMPROVEMENTS:\n`;
+      result += `1. Extract repeated logic into helper methods\n`;
+      result += `2. Add null checks and early returns\n`;
+      result += `3. Move magic numbers into config\n`;
+      result += `4. Use scheduled tasks instead of every-tick work (better FPS)\n`;
+      result += `5. Add proper permission checks\n`;
+      result += `6. Soft-depend support (PlaceholderAPI, Vault, WorldEdit)\n\n`;
+      result += `You can ask next:\n`;
+      result += `- "Add a config system"\n`;
+      result += `- "Optimize for less lag"\n`;
+      result += `- "Add feature: ..."\n`;
+    } else {
+      result += `Project: ${name}\nID: ${id}\nMain class: com.yourname.${id}.${cls}${currentPlatform === 'forge' || currentPlatform === 'fabric' ? 'Mod' : 'Plugin'}\n\n`;
+
+      if (currentPlatform === 'forge' || currentPlatform === 'fabric') {
+        result += `STRUCTURE:\nsrc/main/java/com/yourname/${id}/\n  ${cls}Mod.java\n  config/\n  game/\n  event/\n  command/\nsrc/main/resources/\n  ${currentPlatform === 'forge' ? 'META-INF/mods.toml' : 'fabric.mod.json'}\n\n`;
+        result += `INSTALL:\n1. JDK 17 + ${currentPlatform === 'forge' ? 'Forge MDK' : 'Fabric Loom'} 1.20.1\n2. ./gradlew build\n3. Put jar in mods/ folder\n\n`;
+      } else {
+        result += `STRUCTURE:\nsrc/main/java/com/yourname/${id}/\n  ${cls}Plugin.java\n  command/\n  listener/\n  game/\nsrc/main/resources/\n  plugin.yml\n  config.yml\n\n`;
+        result += `INSTALL:\n1. Build jar\n2. Drop in plugins/ folder\n3. Restart server\n4. Edit config.yml\n\nSoft-depends: PlaceholderAPI, Vault, WorldEdit, LuckPerms\n\n`;
+      }
+
+      result += `FEATURES:\n`;
+      features.forEach((f, i) => result += `${i + 1}. ${f}\n`);
+      result += `\nFPS TIPS:\n• Avoid heavy work every tick\n• Use scheduled tasks (5–20 ticks)\n• Limit particle & scoreboard packets\n`;
+    }
+
+    result += `\nGenerated by ForgeMind AI • ${new Date().toLocaleString()}`;
+    out.textContent = result;
+    out.classList.add('show');
+    status.textContent = 'Done';
+  };
+
+  if (modUploaded) {
+    const f = modUploaded;
+    const note = `${f.name} (${(f.size/1024).toFixed(1)} KB, type: ${f.type || 'unknown'})`;
+    finish(note);
+  } else {
+    setTimeout(() => finish(null), 350);
+  }
+}
+
+function generateMaster() {
+  const desc = (document.getElementById('mixDesc').value || '').trim();
+  const genre = document.getElementById('mixGenre').value;
+  const target = document.getElementById('mixTarget').value;
+  const problems = (document.getElementById('mixProblems').value || '').trim();
+  const status = document.getElementById('masStatus');
+  const out = document.getElementById('masOut');
+
+  status.textContent = 'Creating plan...';
+  out.classList.remove('show');
+
+  const finish = (fileNote) => {
+    const lufs = target === 'streaming' ? '-14 LUFS' : target === 'competitive' ? '-9 to -11 LUFS' : '-12 LUFS';
+    let result = `// =====================================================\n`;
+    result += `// FORGEMIND AI — MUSIC MASTERING PLAN\n`;
+    result += `// =====================================================\n\n`;
+    result += `Target: ${lufs}\nGenre: ${genre}\n`;
+    if (desc) result += `Description: ${desc}\n`;
+    if (problems) result += `Problems: ${problems}\n`;
+    if (fileNote) result += `Uploaded: ${fileNote}\n`;
+    result += `\nCHAIN:\n1. Corrective EQ\n2. Tonal EQ\n3. Subtle saturation\n4. Glue compression\n5. True-peak limiter\n\n`;
+    result += `True Peak: under -1.0 dBTP\nExport: 24-bit WAV\n\n`;
+
+    if (genre === 'trap') {
+      result += `TRAP TIPS:\n• High-pass 808s ~25-30 Hz\n• Keep sub mono\n• Sidechain kick vs 808\n• Vocals presence 3-5 kHz\n`;
+    } else if (genre === 'drill') {
+      result += `DRILL TIPS:\n• Darker tone\n• Clean low end for 808 slides\n• Controlled limiting\n`;
+    } else {
+      result += `GENERAL:\n• Match commercial references\n• Check on phone + earbuds\n• Loudness last\n`;
+    }
+
+    if (problems) {
+      result += `\nADDRESSING PROBLEMS:\n`;
+      if (/mud|low|bass/i.test(problems)) result += `• Cut 200-400 Hz if muddy, check mono sub\n`;
+      if (/harsh|bright|sibil/i.test(problems)) result += `• Soften 2-5 kHz or de-ess\n`;
+      if (/punch|weak|quiet/i.test(problems)) result += `• Protect transients, try parallel compression\n`;
+      if (/vocal/i.test(problems)) result += `• Automate level, add presence, control sibilance\n`;
+    }
+
+    result += `\nCHECKLIST:\n☐ Competitive against references\n☐ No pumping/distortion\n☐ Low end solid in mono\n☐ True peak < -1.0 dBTP\n`;
+    result += `\nGenerated by ForgeMind AI • ${new Date().toLocaleString()}`;
+    out.textContent = result;
+    out.classList.add('show');
+    status.textContent = 'Done';
+  };
+
+  if (masUploaded) {
+    const f = masUploaded;
+    const note = `${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+    if (f.type.startsWith('audio/') || /\.(mp3|wav|flac|ogg|m4a)$/i.test(f.name)) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          ctx.decodeAudioData(e.target.result.slice(0), buf => {
+            finish(`${note} • ${buf.duration.toFixed(1)}s • ${buf.numberOfChannels}ch • ${buf.sampleRate}Hz`);
+            ctx.close();
+          }, () => finish(note));
+        } catch (err) { finish(note); }
+      };
+      reader.onerror = () => finish(note);
+      reader.readAsArrayBuffer(f);
+    } else {
+      finish(note);
+    }
+  } else {
+    setTimeout(() => finish(null), 350);
+  }
+}
+</script>
+</body>
+</html>
